@@ -13,5 +13,5 @@ if (container) {
     </React.StrictMode>
   );
 } else {
-  console.error("Mvs_Aqua: Root element not found");
+  console.error("Mvs_Aqua: Root element '#root' not found in the DOM.");
 }

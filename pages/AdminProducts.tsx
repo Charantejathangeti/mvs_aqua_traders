@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Product, Role } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { Trash2, Edit2, Plus, Save, X, RefreshCw, Loader2, CheckCircle2 } from 'lucide-react';
+import { Trash2, Edit2, Plus, Save, X, RefreshCw, Loader2, CheckCircle2, ExternalLink, Database } from 'lucide-react';
 import { ProductService } from '../services/productService';
 
 export const AdminProducts: React.FC = () => {
@@ -115,37 +115,61 @@ export const AdminProducts: React.FC = () => {
     <div className="container mx-auto pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-deepSea">Product Management</h1>
-          <p className="text-sm text-gray-500">Changes are saved instantly to your browser's persistent storage.</p>
+          <h1 className="text-2xl font-bold text-deepSea flex items-center gap-2">
+            <Database size={24} className="text-coralPop" />
+            Product Inventory
+          </h1>
+          <p className="text-sm text-gray-500">Manage your catalog via Google Sheets or local controls.</p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {showSaveToast && (
             <div className="flex items-center gap-1 text-green-600 bg-green-50 px-3 py-1 rounded-full text-sm font-medium border border-green-100 animate-in fade-in slide-in-from-right-2">
-              <CheckCircle2 size={16} /> Saved
+              <CheckCircle2 size={16} /> Updated
             </div>
           )}
           <button 
             onClick={syncData}
             disabled={syncing}
-            className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 transition"
+            className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-50 disabled:opacity-50 transition shadow-sm"
           >
             {syncing ? <Loader2 className="animate-spin" size={18} /> : <RefreshCw size={18} />}
-            Reset to Defaults
+            Sync Sheet
           </button>
           <button 
             onClick={startAdd}
             disabled={isAdding}
-            className="bg-deepSea text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#003d61] disabled:opacity-50 transition"
+            className="bg-deepSea text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#003d61] disabled:opacity-50 transition shadow-md"
           >
-            <Plus size={18} /> Add Product
+            <Plus size={18} /> New Product
           </button>
         </div>
       </div>
 
+      <div className="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
+            <Database size={20} />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-blue-900">Google Sheet Database</p>
+            <p className="text-xs text-blue-700">Connect your spreadsheet to update prices and stock in real-time.</p>
+          </div>
+        </div>
+        <a 
+          href="https://docs.google.com/spreadsheets" 
+          target="_blank" 
+          rel="noreferrer"
+          className="text-xs font-bold bg-white px-3 py-1.5 rounded-lg border border-blue-200 text-blue-600 hover:bg-blue-50 flex items-center gap-1 transition"
+        >
+          Open Sheet <ExternalLink size={12} />
+        </a>
+      </div>
+
       {loading ? (
-        <div className="flex justify-center py-20">
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
           <Loader2 className="animate-spin text-deepSea w-10 h-10" />
+          <p className="text-gray-400 animate-pulse">Fetching inventory...</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -177,7 +201,7 @@ export const AdminProducts: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button onClick={saveAdd} className="bg-green-600 text-white p-2 rounded hover:bg-green-700"><Save size={18} /></button>
+                        <button onClick={saveAdd} className="bg-green-600 text-white p-2 rounded hover:bg-green-700 shadow-sm"><Save size={18} /></button>
                         <button onClick={cancelEdit} className="bg-gray-200 text-gray-600 p-2 rounded hover:bg-gray-300"><X size={18} /></button>
                       </div>
                     </td>
@@ -193,13 +217,13 @@ export const AdminProducts: React.FC = () => {
                 )}
 
                 {products.map(product => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4">
                       {editingId === product.id ? (
                         <input name="name" className="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-deepSea outline-none" value={editForm.name} onChange={handleChange} />
                       ) : (
                         <div className="flex items-center gap-3">
-                          <img src={product.imageUrl} alt="" className="w-8 h-8 rounded-full object-cover bg-gray-100" />
+                          <img src={product.imageUrl} alt="" className="w-8 h-8 rounded-full object-cover bg-gray-100 group-hover:scale-110 transition-transform" />
                           <span className="font-medium text-deepSea">{product.name}</span>
                         </div>
                       )}
@@ -215,7 +239,7 @@ export const AdminProducts: React.FC = () => {
                       {editingId === product.id ? (
                         <input name="stockCount" type="number" className="w-20 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-deepSea outline-none" value={editForm.stockCount} onChange={handleChange} />
                       ) : (
-                        <span className={`${product.stockCount === 0 ? 'text-red-500 font-bold' : product.stockCount <= 10 ? 'text-orange-500' : 'text-green-600'}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${product.stockCount === 0 ? 'bg-red-50 text-red-600' : product.stockCount <= 10 ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600'}`}>
                           {product.stockCount}
                         </span>
                       )}
@@ -228,7 +252,7 @@ export const AdminProducts: React.FC = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {editingId === product.id ? (
                           <>
                             <button onClick={saveEdit} className="text-green-600 hover:bg-green-50 p-1.5 rounded" title="Save"><Save size={18} /></button>

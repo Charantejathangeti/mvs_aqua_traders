@@ -19,18 +19,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     try {
-      const savedUser = typeof window !== 'undefined' ? localStorage.getItem(AUTH_STORAGE_KEY) : null;
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
+      if (typeof window !== 'undefined') {
+        const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
       }
     } catch (e) {
       console.error("Auth persistence failed", e);
+      if (typeof window !== 'undefined') localStorage.removeItem(AUTH_STORAGE_KEY);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = (username: string, password: string): boolean => {
+    // Demo Credentials
+    // Username: admin
+    // Password: mvs_aqua_pass
     if (username === 'admin' && password === 'mvs_aqua_pass') {
       const newUser: User = {
         id: 'admin_1',
@@ -39,7 +45,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
       setUser(newUser);
       try {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
+        }
       } catch (e) {
         console.error("Failed to save auth to storage", e);
       }
@@ -51,7 +59,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setUser(null);
     try {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+      }
     } catch (e) {
       console.error("Failed to clear auth storage", e);
     }

@@ -4,62 +4,79 @@ import { INITIAL_PRODUCTS } from './mockData';
 
 export class ProductService {
   private static STORAGE_KEY = 'mvs_aqua_products_v1';
+  // Replace this ID with your actual Google Sheet ID after publishing as CSV
+  private static SHEET_ID = '1-YOUR-SHEET-ID-HERE'; 
+  private static SHEET_URL = `https://docs.google.com/spreadsheets/d/${this.SHEET_ID}/export?format=csv`;
 
   /**
-   * Fetches the latest products from local storage, falling back to 
-   * default mock data if none exists.
+   * Fetches products. Priority: 
+   * 1. Live Google Sheet (if configured)
+   * 2. Local Storage (cached)
+   * 3. Default Mock Data
    */
   static async getProducts(): Promise<Product[]> {
-    const localData = localStorage.getItem(this.STORAGE_KEY);
-    
-    if (localData) {
+    // Attempt to fetch from Google Sheets if a real ID is provided
+    if (!this.SHEET_ID.includes('YOUR-SHEET-ID')) {
       try {
-        const parsed = JSON.parse(localData);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+        const response = await fetch(this.SHEET_URL);
+        if (response.ok) {
+          const csvText = await response.text();
+          const products = this.parseCSV(csvText);
+          if (products.length > 0) {
+            this.saveProducts(products);
+            return products;
+          }
         }
       } catch (e) {
-        console.error("Failed to parse local products, resetting to defaults", e);
+        console.warn("ProductService: Google Sheet fetch failed, falling back to cache.", e);
       }
     }
 
-    // Default Fallback
-    const defaults = INITIAL_PRODUCTS.map(p => ({
-      ...p,
-      category: p.category || 'Livestock',
-      difficulty: p.difficulty || 'Beginner'
-    }));
+    const localData = localStorage.getItem(this.STORAGE_KEY);
+    if (localData) {
+      try {
+        const parsed = JSON.parse(localData);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error("Failed to parse local products", e);
+      }
+    }
+
+    return INITIAL_PRODUCTS;
+  }
+
+  /**
+   * Simple CSV parser for Google Sheets output
+   */
+  private static parseCSV(csv: string): Product[] {
+    const lines = csv.split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     
-    // Save defaults immediately so they are "persistent" from the start
-    this.saveProducts(defaults);
-    return defaults;
+    return lines.slice(1).map(line => {
+      const values = line.split(',').map(v => v.trim());
+      const entry: any = {};
+      headers.forEach((header, i) => {
+        const val = values[i];
+        if (['price', 'stockcount', 'weightgrams'].includes(header)) {
+          entry[header === 'stockcount' ? 'stockCount' : header === 'weightgrams' ? 'weightGrams' : header] = Number(val) || 0;
+        } else {
+          entry[header] = val;
+        }
+      });
+      return entry as Product;
+    }).filter(p => p.name && p.id);
   }
 
-  /**
-   * Simulates a sync with an external source like Google Sheets.
-   * In a real app, this would perform a fetch() request.
-   */
   static async syncWithGoogleSheet(): Promise<Product[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Here we just re-load the initial set as a "reset" or "sync"
-        const products = INITIAL_PRODUCTS;
-        this.saveProducts(products);
-        resolve(products);
-      }, 1200);
-    });
+    return this.getProducts();
   }
 
-  /**
-   * Saves the product list to localStorage.
-   */
   static saveProducts(products: Product[]) {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(products));
-      // Dispatch a custom event so other components can react if they need to
       window.dispatchEvent(new Event('product-catalog-updated'));
     } catch (e) {
-      console.error("Failed to save products to localStorage", e);
+      console.error("Failed to save products", e);
     }
   }
 }
