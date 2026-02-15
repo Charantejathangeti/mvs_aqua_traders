@@ -21,8 +21,7 @@ export const Layout: React.FC = () => {
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
-      {/* Header */}
+    <div className="min-h-screen flex flex-col font-sans text-gray-800">
       <header className="bg-deepSea text-white sticky top-0 z-50 shadow-md">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold tracking-tight flex items-center gap-2">
@@ -34,7 +33,7 @@ export const Layout: React.FC = () => {
               Catalog
             </Link>
             
-            {(user?.role === Role.ADMIN || user?.role === Role.OWNER) && (
+            {user && (user.role === Role.ADMIN || user.role === Role.OWNER) && (
               <Link to="/admin/products" className={`hover:text-coralPop transition flex items-center gap-1 ${location.pathname.includes('admin') ? 'text-coralPop' : ''}`}>
                 <Package size={18} /> Admin
               </Link>
@@ -71,15 +70,12 @@ export const Layout: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-grow container mx-auto px-4 py-8">
         <Outlet />
       </main>
 
-      {/* AI Assistant */}
       <AiAssistant products={products} />
 
-      {/* Footer */}
       <footer className="bg-slate-900 text-slate-300 py-8 text-sm">
         <div className="container mx-auto px-4 grid md:grid-cols-3 gap-8">
           <div>

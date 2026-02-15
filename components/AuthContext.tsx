@@ -17,6 +17,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Check for existing session on mount
   useEffect(() => {
     const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
     if (savedUser) {
@@ -30,6 +31,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = (username: string, password: string): boolean => {
+    // Demo Credentials
+    // Username: admin
+    // Password: mvs_aqua_pass
     if (username === 'admin' && password === 'mvs_aqua_pass') {
       const newUser: User = {
         id: 'admin_1',
