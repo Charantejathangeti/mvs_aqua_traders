@@ -15,23 +15,26 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const CART_STORAGE_KEY = 'mvs_aqua_cart_items';
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initialize state from localStorage if available
   const [items, setItems] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
-    if (savedCart) {
-      try {
+    try {
+      const savedCart = typeof window !== 'undefined' ? localStorage.getItem(CART_STORAGE_KEY) : null;
+      if (savedCart) {
         return JSON.parse(savedCart);
-      } catch (e) {
-        console.error("Failed to load cart from storage", e);
-        return [];
       }
+    } catch (e) {
+      console.error("Failed to load cart from storage", e);
     }
     return [];
   });
 
-  // Persist to localStorage whenever items change
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+      }
+    } catch (e) {
+      console.error("Failed to save cart to storage", e);
+    }
   }, [items]);
 
   const addToCart = (product: Product, quantity: number) => {

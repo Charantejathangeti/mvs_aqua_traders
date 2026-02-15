@@ -15,7 +15,9 @@ export const Layout: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    ProductService.getProducts().then(setProducts);
+    ProductService.getProducts().then(setProducts).catch(err => {
+      console.error("Layout: Failed to load products for AI Assistant", err);
+    });
   }, [location.pathname]);
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
@@ -74,6 +76,7 @@ export const Layout: React.FC = () => {
         <Outlet />
       </main>
 
+      {/* AiAssistant needs the products to provide contextual help */}
       <AiAssistant products={products} />
 
       <footer className="bg-slate-900 text-slate-300 py-8 text-sm">
