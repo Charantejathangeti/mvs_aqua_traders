@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { calculateShipping, generateWhatsAppLink } from '../services/shippingService';
 import { OrderForm } from '../types';
-import { CheckCircle, ShieldCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CheckCircle, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
 export const Checkout: React.FC = () => {
   const { items, clearCart } = useCart();
@@ -31,27 +32,32 @@ export const Checkout: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate Backend Order Creation
     const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const link = generateWhatsAppLink(items, shipping, form, orderId);
 
-    // In a real app, we would POST to /api/orders here
-    // For now, we simulate the delay and redirect
     setTimeout(() => {
       clearCart();
-      // Redirect to Success Page which then auto-opens WhatsApp or shows button
-      // But for this flow, we will direct the user directly to WhatsApp in a new tab and show success
       window.open(link, '_blank');
       navigate('/checkout/success');
     }, 1500);
   };
+
+  if (items.length === 0) {
+    return (
+      <div className="max-w-md mx-auto py-20 text-center">
+        <h2 className="text-xl font-bold mb-4">Your cart is empty</h2>
+        <Link to="/" className="text-deepSea font-bold flex items-center justify-center gap-2">
+          <ArrowLeft size={18} /> Back to Catalog
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-deepSea mb-8 text-center">Secure Checkout</h1>
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Form */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-6 text-green-600 bg-green-50 p-3 rounded-lg border border-green-100">
             <ShieldCheck size={20} />
@@ -107,48 +113,22 @@ export const Checkout: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">City/Town</label>
-                <input 
-                  required 
-                  type="text" 
-                  name="city" 
-                  value={form.city}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition"
-                />
+                <input required type="text" name="city" value={form.city} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                <input 
-                  required 
-                  type="text" 
-                  name="pincode" 
-                  value={form.pincode}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition"
-                />
+                <input required type="text" name="pincode" value={form.pincode} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">District</label>
-                <input 
-                  required 
-                  type="text" 
-                  name="district" 
-                  value={form.district}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition"
-                />
+                <input required type="text" name="district" value={form.district} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <select 
-                  name="state" 
-                  value={form.state} 
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition bg-white"
-                >
+                <select name="state" value={form.state} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-deepSea focus:border-deepSea outline-none transition bg-white">
                   <option value="Andhra Pradesh">Andhra Pradesh</option>
                   <option value="Telangana">Telangana</option>
                 </select>
@@ -162,16 +142,12 @@ export const Checkout: React.FC = () => {
             >
               {loading ? 'Processing...' : 'Confirm Order via WhatsApp'}
             </button>
-            <p className="text-xs text-center text-gray-500 mt-2">
-              By clicking confirm, you will be redirected to WhatsApp to send your order details directly to the owner.
-            </p>
           </form>
         </div>
 
-        {/* Mini Summary */}
-        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 h-fit">
-          <h3 className="font-bold text-gray-800 mb-4">Your Order</h3>
-          <div className="space-y-3 mb-6">
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 h-fit space-y-4">
+          <h3 className="font-bold text-gray-800">Your Order</h3>
+          <div className="space-y-3">
             {items.map(item => (
               <div key={item.id} className="flex justify-between text-sm">
                 <span className="text-gray-600">{item.name} x{item.quantity}</span>
@@ -184,3 +160,18 @@ export const Checkout: React.FC = () => {
             <div className="flex justify-between text-sm text-gray-600">
               <span>Subtotal</span>
               <span>₹{subtotal}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600">
+              <span>Shipping</span>
+              <span>₹{shipping.cost}</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold text-deepSea pt-4 border-t border-gray-200 mt-2">
+              <span>Total</span>
+              <span>₹{total}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

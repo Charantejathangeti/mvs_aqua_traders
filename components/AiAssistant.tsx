@@ -15,7 +15,6 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ products }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { addToCart } = useCart();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -32,9 +31,18 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ products }) => {
     setLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // Use a guard to ensure process is available
+      const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : '';
+      
+      if (!apiKey) {
+        setMessages(prev => [...prev, { role: 'assistant', text: "AI Assistant is currently unavailable (API key missing)." }]);
+        setLoading(false);
+        return;
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
       const catalogInfo = products.map(p => 
-        `ID: ${p.id}, Name: ${p.name}, Price: ₹${p.price}, Difficulty: ${p.difficulty}, Category: ${p.category}, Description: ${p.description}`
+        `ID: ${p.id}, Name: ${p.name}, Price: ₹${p.price}, Difficulty: ${p.difficulty || 'N/A'}, Category: ${p.category || 'Livestock'}, Description: ${p.description}`
       ).join('\n');
 
       const response = await ai.models.generateContent({
@@ -46,9 +54,9 @@ export const AiAssistant: React.FC<AiAssistantProps> = ({ products }) => {
           Rules:
           1. Be friendly and helpful.
           2. Recommend products based on user needs (tank size, difficulty, budget).
-          3. If the user wants to buy something, mention the product name.
+          3. If the user wants to buy something, mention the exact product name from the catalog.
           4. If the user asks for help picking, suggest 1-3 items.
-          5. Keep responses concise.`,
+          5. Keep responses concise and focused on the aquatic hobby.`,
         },
       });
 
