@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Product } from '../types';
-import { ProductCard } from '../components/ProductCard';
-import { ProductService } from '../services/productService';
+import { Product } from '../types.ts';
+import { ProductCard } from '../components/ProductCard.tsx';
+import { ProductService } from '../services/productService.ts';
 import { Search, Loader2 } from 'lucide-react';
 
 export const Catalog: React.FC = () => {
@@ -16,14 +16,19 @@ export const Catalog: React.FC = () => {
 
   const loadProducts = async () => {
     setLoading(true);
-    const data = await ProductService.getProducts();
-    setProducts(data);
-    setLoading(false);
+    try {
+      const data = await ProductService.getProducts();
+      setProducts(data);
+    } catch (e) {
+      console.error("Failed to load products", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) || 
-    p.category?.toLowerCase().includes(search.toLowerCase()) ||
+    (p.category && p.category.toLowerCase().includes(search.toLowerCase())) ||
     p.description.toLowerCase().includes(search.toLowerCase())
   );
 

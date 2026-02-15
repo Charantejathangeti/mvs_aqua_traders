@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/CartContext';
-import { Role, Product } from '../types';
-import { ShoppingCart, Package, User as UserIcon, LogOut, LogIn } from 'lucide-react';
-import { AiAssistant } from './AiAssistant';
-import { ProductService } from '../services/productService';
+import { useAuth } from '../context/AuthContext.tsx';
+import { useCart } from '../context/CartContext.tsx';
+import { Role, Product } from '../types.ts';
+import { ShoppingCart, Package, LogOut, LogIn } from 'lucide-react';
+import { AiAssistant } from './AiAssistant.tsx';
+import { ProductService } from '../services/productService.ts';
 
 export const Layout: React.FC = () => {
   const { user, logout } = useAuth();
@@ -76,7 +76,6 @@ export const Layout: React.FC = () => {
         <Outlet />
       </main>
 
-      {/* AiAssistant needs the products to provide contextual help */}
       <AiAssistant products={products} />
 
       <footer className="bg-slate-900 text-slate-300 py-8 text-sm">

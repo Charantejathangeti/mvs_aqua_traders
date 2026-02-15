@@ -1,15 +1,15 @@
 
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
-import { Layout } from './components/Layout';
-import { Catalog } from './pages/Catalog';
-import { CartPage } from './pages/CartPage';
-import { Checkout } from './pages/Checkout';
-import { SuccessPage } from './pages/SuccessPage';
-import { AdminProducts } from './pages/AdminProducts';
-import { LoginPage } from './pages/LoginPage';
+import { AuthProvider } from './context/AuthContext.tsx';
+import { CartProvider } from './context/CartContext.tsx';
+import { Layout } from './components/Layout.tsx';
+import { Catalog } from './pages/Catalog.tsx';
+import { CartPage } from './pages/CartPage.tsx';
+import { Checkout } from './pages/Checkout.tsx';
+import { SuccessPage } from './pages/SuccessPage.tsx';
+import { AdminProducts } from './pages/AdminProducts.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
 
 const App: React.FC = () => {
   return (
