@@ -1,0 +1,58 @@
+import { Product } from '../types';
+
+export const INITIAL_PRODUCTS: Product[] = [
+  {
+    id: '1',
+    name: 'Neon Tetra',
+    price: 45,
+    stockCount: 150,
+    weightGrams: 5,
+    imageUrl: 'https://picsum.photos/400/300?random=1',
+    description: 'Vibrant blue and red stripes. Peaceful community fish.',
+  },
+  {
+    id: '2',
+    name: 'Betta Splendens (Male)',
+    price: 250,
+    stockCount: 8,
+    weightGrams: 20,
+    imageUrl: 'https://picsum.photos/400/300?random=2',
+    description: 'Show quality male Betta with flowing fins.',
+  },
+  {
+    id: '3',
+    name: 'Guppy Pair (Fancy)',
+    price: 120,
+    stockCount: 0,
+    weightGrams: 10,
+    imageUrl: 'https://picsum.photos/400/300?random=3',
+    description: 'Colorful fancy guppy breeding pair.',
+  },
+  {
+    id: '4',
+    name: 'Angel Fish (Marble)',
+    price: 180,
+    stockCount: 5,
+    weightGrams: 40,
+    imageUrl: 'https://picsum.photos/400/300?random=4',
+    description: 'Classic marble pattern angelfish.',
+  },
+  {
+    id: '5',
+    name: 'Discus (Turquoise)',
+    price: 1500,
+    stockCount: 12,
+    weightGrams: 150,
+    imageUrl: 'https://picsum.photos/400/300?random=5',
+    description: 'High grade Turquoise Discus. 3 inch size.',
+  },
+  {
+    id: '6',
+    name: 'Goldfish (Oranda)',
+    price: 350,
+    stockCount: 25,
+    weightGrams: 100,
+    imageUrl: 'https://picsum.photos/400/300?random=6',
+    description: 'Red cap Oranda goldfish.',
+  },
+];
